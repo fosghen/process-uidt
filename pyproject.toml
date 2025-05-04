@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "process uidt"
+version = "0.1.0"
+description = ""
+authors = ["fosghen <r.efremov2@g.nsu.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+scipy = "^1.15.2"
+polars = "^1.29.0"
+joblib = "^1.4.2"
+matplotlib = "^3.10.1"
+watchdog = "^6.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
