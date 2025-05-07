@@ -4,9 +4,10 @@ import numpy as np
 import polars as pl
 
 from plotter.plotter import Plotter
+from processing.peak_finder import PeakFinder
 
 class Processor:
-    def __init__(self, num_pts_norm, point_cut, point_start, point_end, freq_cut, transparency, inv: str="auto"):
+    def __init__(self, num_pts_norm, point_cut, point_start, point_end, freq_cut, data_type, transparency, inv: str="auto"):
         self.inv = inv    
         self.num_pts_norm = num_pts_norm
 
@@ -16,6 +17,8 @@ class Processor:
         self.freq_cut = freq_cut
 
         self.transparency = transparency
+
+        self.data_type = data_type
 
         self.dx = 1
 
@@ -63,7 +66,12 @@ class Processor:
         return (reshaped - baseline).reshape((-1, data.shape[1]))
     
     def _norm_data_by_max(self, data: np.ndarray) -> np.ndarray:
-        return (data - data.min(axis=0)) / data.max(axis=0)
+        data = data.T
+        data -= data.min(axis=0)
+        return data / data.max(axis=0)
+
+    def _get_index(self, length: float) -> int:
+        return int(length / self.dx)
 
     def process_file(self, path: Path) -> None:
         sleep(0.5)
@@ -74,4 +82,7 @@ class Processor:
         plotter = Plotter(self.freq_cut, self.point_cut, self.point_start,
                  self.point_end, self.dx, self.transparency, "Figures")
         length = self._get_length(path)
-        plotter.create_plot(data_norm, freqs, length, length, path)
+        finder = PeakFinder(self.data_type)
+ 
+        f0 = finder.find_peak(freqs, self._norm_data_by_max(data_norm).T[self._get_index(self.point_start): self._get_index(self.point_end)])
+        plotter.create_plot(data_norm, freqs, length, f0, path)

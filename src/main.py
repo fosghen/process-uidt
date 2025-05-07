@@ -6,6 +6,7 @@ from processing.precessor import Processor
 from initializer.initializer import Reader
 
 def main():
+    # TODO: сделать проверку на наличие файла, если нет, то создать стандартный
     params = Reader(Path("D:/process-uidt/test_path/params.yaml")).read_init_file()
 
     processor = Processor(num_pts_norm=params.num_pts_norm, 
@@ -13,7 +14,8 @@ def main():
                           point_start=params.point_start,
                           point_end=params.point_end,
                           freq_cut=params.freq_cut,
-                          transparency=params.transparency)
+                          transparency=params.transparency,
+                          data_type=params.data_type)
 
     async_handler = AsyncFileHandler(
         callback=processor.process_file,
