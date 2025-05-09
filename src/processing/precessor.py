@@ -84,5 +84,11 @@ class Processor:
         length = self._get_length(path)
         finder = PeakFinder(self.data_type)
  
-        f0 = finder.find_peak(freqs, self._norm_data_by_max(data_norm).T[self._get_index(self.point_start): self._get_index(self.point_end)])
-        plotter.create_plot(data_norm, freqs, length, f0, path)
+        f0 = finder.find_peak(freqs, self._norm_data_by_max(data_norm).T[self._get_index(self.point_start):
+                                                                         self._get_index(self.point_end)])
+        plotter.create_plot(data_norm,
+                            freqs,
+                            length[self._get_index(self.point_start):
+                                   self._get_index(self.point_end)],
+                            f0,
+                            path)

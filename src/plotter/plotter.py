@@ -61,11 +61,9 @@ class Plotter:
                     freqs.min()
                     )
                     )
-        
-        ax.plot(length[self._get_index(self.point_start):
-                       self._get_index(point_end)],
-                # peaks_freq,
-                np.linspace(freqs.min(), freqs.max(), self._get_index(point_end) - self._get_index(self.point_start)),
+
+        ax.plot(length,
+                peaks_freq,
                 alpha=self.transparency,
                 c='k')
         

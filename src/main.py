@@ -7,7 +7,7 @@ from initializer.initializer import Reader
 
 def main():
     # TODO: сделать проверку на наличие файла, если нет, то создать стандартный
-    params = Reader(Path("D:/process-uidt/test_path/params.yaml")).read_init_file()
+    params = Reader(Path("test_path/params.yaml")).read_init_file()
 
     processor = Processor(num_pts_norm=params.num_pts_norm, 
                           point_cut=params.point_cut,
@@ -23,7 +23,7 @@ def main():
     )
 
     watcher = Watcher(
-        watch_path=Path(r"D:/process-uidt/test_path"),
+        watch_path=Path(r"test_path"),
         callback=async_handler.add_file,
     )
     watcher.start()
@@ -31,7 +31,7 @@ def main():
     try:
         while True:
             print(f"\nАктивных задач: {async_handler.file_queue.qsize()}")
-            sleep(0.1)
+            sleep(5)
     except KeyboardInterrupt:
         print("\nЗавершение работы...")
         watcher.stop()
