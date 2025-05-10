@@ -50,7 +50,7 @@ class PeakFinder:
                                           [freq[-1],    4]),
                                           )
             return params[0]
-        except OptimizeWarning:
+        except Exception as e:
             return freq[0]
 
     @staticmethod
@@ -73,7 +73,7 @@ class PeakFinder:
                                 bounds=((freq[lo_peaks[i]], 2),
                                         (freq[-1],         4)))
             return (params0[0] + params1[0]) / 2
-        except OptimizeWarning:
+        except Exception as e:
             
             return float(freq[hi_peaks[i][0]] + freq[hi_peaks[i][1]]) / 2
 

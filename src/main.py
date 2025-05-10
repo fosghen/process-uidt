@@ -1,13 +1,20 @@
 from time import sleep
 from pathlib import Path
 
-from observer.observer import AsyncFileHandler, Watcher
-from processing.precessor import Processor
-from initializer.initializer import Reader
+from src.observer.observer import AsyncFileHandler, Watcher
+from src.processing.precessor import Processor
+from src.initializer.initializer import Reader
+from src.initializer.argparser import CommandLineParser
 
 def main():
-    # TODO: сделать проверку на наличие файла, если нет, то создать стандартный
-    params = Reader(Path("test_path/params.yaml")).read_init_file()
+    parser = CommandLineParser()
+    args = parser.parse()
+
+    if args.params:
+        params = Reader(Path(args.params)).read_init_file()
+    else:
+        params = Reader(Path(args.path) / "params.yaml").write_default_init_file()
+    
 
     processor = Processor(num_pts_norm=params.num_pts_norm, 
                           point_cut=params.point_cut,
@@ -23,7 +30,7 @@ def main():
     )
 
     watcher = Watcher(
-        watch_path=Path(r"test_path"),
+        watch_path=Path(args.path),
         callback=async_handler.add_file,
     )
     watcher.start()

@@ -3,8 +3,8 @@ from time import sleep
 import numpy as np
 import polars as pl
 
-from plotter.plotter import Plotter
-from processing.peak_finder import PeakFinder
+from src.plotter.plotter import Plotter
+from src.processing.peak_finder import PeakFinder
 
 class Processor:
     def __init__(self, num_pts_norm, point_cut, point_start, point_end, freq_cut, data_type, transparency, inv: str="auto"):

@@ -38,7 +38,7 @@ class Reader:
             data = yaml.safe_load(f)
         return AppParams(**data)
     
-    def write_default_init_file(self) -> None:
+    def write_default_init_file(self) -> AppParams:
         config = AppParams()
         data = config.model_dump(mode='json', exclude_none=True)
 
@@ -51,3 +51,4 @@ class Reader:
                 allow_unicode=True,
                 encoding='utf-8'
             )
+        return config
