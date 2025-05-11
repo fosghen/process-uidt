@@ -1,8 +1,8 @@
 from time import sleep
 from pathlib import Path
 
-from src.observer.observer import AsyncFileHandler, Watcher
-from src.processing.precessor import Processor
+from src.observer.observer import AsyncFileHandler, Watcher, OnceFileHandler
+from src.processing.processor import Processor
 from src.initializer.initializer import Reader
 from src.initializer.argparser import CommandLineParser
 
@@ -15,7 +15,6 @@ def main():
     else:
         params = Reader(Path(args.path) / "params.yaml").write_default_init_file()
     
-
     processor = Processor(num_pts_norm=params.num_pts_norm, 
                           point_cut=params.point_cut,
                           point_start=params.point_start,
@@ -23,6 +22,11 @@ def main():
                           freq_cut=params.freq_cut,
                           transparency=params.transparency,
                           data_type=params.data_type)
+
+    if not args.monitor:
+        OnceFileHandler(processor.process_file).process_directory(Path(args.path))
+        processor.saver.save_file()
+        return
 
     async_handler = AsyncFileHandler(
         callback=processor.process_file,
@@ -37,10 +41,10 @@ def main():
 
     try:
         while True:
-            print(f"\nАктивных задач: {async_handler.file_queue.qsize()}")
-            sleep(5)
+            sleep(1)
     except KeyboardInterrupt:
         print("\nЗавершение работы...")
+        processor.saver.save_file()
         watcher.stop()
         async_handler.stop()
 

@@ -6,10 +6,9 @@ import numpy as np
 
 class Plotter:
     def __init__(self, freq_cut: int, point_cut: float, point_start: float,
-                 point_end: float, dx: float, transparency: float=0.5,
-                 output_dir :str="figures"):
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+                 point_end: float, dx: float, output_dir: Path,
+                 transparency: float=0.5):
+        self.output_dir = output_dir
         self.freq_cut = freq_cut
         self.point_cut = point_cut
         self.point_start = point_start
@@ -35,6 +34,8 @@ class Plotter:
         self._plot_additional_slices(ax, data, freqs, length)
         
         save_path = self.output_dir / f"{fname.stem}.png"
+
+        self.output_dir.mkdir(exist_ok=True)
 
         plt.savefig(save_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
         plt.close()

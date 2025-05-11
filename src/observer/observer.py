@@ -6,9 +6,12 @@ import threading
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+from os import listdir
+
 class AsyncFileHandler:
+    # TODO: сделать сверку файлов в Figures и целевой папке. Недостающие закинуть в очередь. Можно и в основном потоке
     def __init__(self, callback: Callable, max_workers: int=1) -> None:
-        self.file_queue = queue.Queue()
+        self.file_queue: queue.Queue[Path] = queue.Queue()
         self.callback = callback
         self._stop_event = threading.Event()
         
@@ -45,6 +48,25 @@ class AsyncFileHandler:
         self._stop_event.set()
         for w in self.workers:
             w.join(timeout=5)
+
+class OnceFileHandler:
+    def __init__(self, callback: Callable) -> None:
+        self.callback = callback
+    
+    @staticmethod
+    def _get_fnames(path: Path) -> list:
+        fnames_all = listdir(path)
+        fnames = []
+        for fname in fnames_all:
+            if fname.split(".")[-1] == "csv":
+                fnames.append(path / fname)
+        return fnames
+
+    def process_directory(self, path: Path) -> None:
+        fnames = OnceFileHandler._get_fnames(path)
+        for fname in fnames:
+            self.callback(fname)
+        
 
 class Watcher:
     def __init__(self, watch_path, callback):

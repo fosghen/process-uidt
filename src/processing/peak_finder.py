@@ -3,7 +3,7 @@ from joblib import Parallel, delayed
 import numpy as np
 from scipy.signal import medfilt, find_peaks
 from scipy.ndimage import convolve1d
-from scipy.optimize import curve_fit, OptimizeWarning
+from scipy.optimize import curve_fit
 
 class PeakFinder:
     def __init__(self, data_type: str, ) -> None:
@@ -50,7 +50,7 @@ class PeakFinder:
                                           [freq[-1],    4]),
                                           )
             return params[0]
-        except Exception as e:
+        except Exception:
             return freq[0]
 
     @staticmethod
@@ -73,7 +73,7 @@ class PeakFinder:
                                 bounds=((freq[lo_peaks[i]], 2),
                                         (freq[-1],         4)))
             return (params0[0] + params1[0]) / 2
-        except Exception as e:
+        except Exception:
             
             return float(freq[hi_peaks[i][0]] + freq[hi_peaks[i][1]]) / 2
 

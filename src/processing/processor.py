@@ -3,11 +3,14 @@ from time import sleep
 import numpy as np
 import polars as pl
 
-from src.plotter.plotter import Plotter
+from src.saver.peak_saver import PeakSaver
+from src.saver.plotter import Plotter
 from src.processing.peak_finder import PeakFinder
 
 class Processor:
-    def __init__(self, num_pts_norm, point_cut, point_start, point_end, freq_cut, data_type, transparency, inv: str="auto"):
+    def __init__(self, num_pts_norm: int, point_cut: float,
+                 point_start: float, point_end: float, freq_cut: int,
+                 data_type: str, transparency: float, inv: str="auto"):
         self.inv = inv    
         self.num_pts_norm = num_pts_norm
 
@@ -21,6 +24,11 @@ class Processor:
         self.data_type = data_type
 
         self.dx = 1
+
+        self.plotter = Plotter(self.freq_cut, self.point_cut, self.point_start,
+                 self.point_end, self.dx, Path("Figures"), self.transparency)
+        self.finder = PeakFinder(self.data_type)
+        self.saver = PeakSaver(Path("Peaks"))
 
     def _define_rowskip(self, fname: Path) -> tuple[int, list[str]]:
         with fname.open() as f:
@@ -73,22 +81,32 @@ class Processor:
     def _get_index(self, length: float) -> int:
         return int(length / self.dx)
 
+    def _data_prepare(self, path: Path) -> tuple[np.ndarray, np.ndarray]:
+        data, freqs = self._read_file(path)
+        data_norm = self._norm_data_by_ballast(data, self._define_num_phase(path))
+        return data_norm * self._make_inv(data_norm), freqs
+
+
     def process_file(self, path: Path) -> None:
         sleep(0.5)
-        data, freqs = self._read_file(path)
-
-        data_norm = self._norm_data_by_ballast(data, self._define_num_phase(path))
-        data_norm = data_norm * self._make_inv(data_norm)
-        plotter = Plotter(self.freq_cut, self.point_cut, self.point_start,
-                 self.point_end, self.dx, self.transparency, "Figures")
+        print(f"Начали обрабатывать {path}")
+        
+        data_norm, freqs = self._data_prepare(path)
         length = self._get_length(path)
-        finder = PeakFinder(self.data_type)
- 
-        f0 = finder.find_peak(freqs, self._norm_data_by_max(data_norm).T[self._get_index(self.point_start):
-                                                                         self._get_index(self.point_end)])
-        plotter.create_plot(data_norm,
+        
+        self.plotter.output_dir = path.parent / "Figures"
+        self.plotter.dx = abs(length[1] - length[0])
+
+        self.saver.output_dir = path.parent / "Peaks"
+
+        f0 = self.finder.find_peak(freqs,
+                                self._norm_data_by_max(data_norm).T[self._get_index(self.point_start):
+                                                                    self._get_index(self.point_end)])
+        self.plotter.create_plot(data_norm,
                             freqs,
                             length[self._get_index(self.point_start):
                                    self._get_index(self.point_end)],
                             f0,
                             path)
+        self.saver.add_peak(f0, path.stem)
+        print(f"Закончили обрабатывать {path}")

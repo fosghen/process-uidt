@@ -3,7 +3,8 @@ import argparse
 class CommandLineParser:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description="--path путь до папки с данными\n" \
-        "--params путь до файла с параметрами")
+        "--params путь до файла с параметрами" \
+        "--monitor выполнить обработку единожды всех файлов или обрабатывать только новые файлы")
         self._setup_arguments()
 
     def _str2bool(self, v):
@@ -22,7 +23,7 @@ class CommandLineParser:
         self.parser.add_argument('--params', type=str, required=False,
                                 help="Путь до файла с параметрами, если не указано," \
                                 " то ищется в папке, где вызвано. При не нахождении создаёт шаблон")
-        self.parser.add_argument("--monitor", type=self._str2bool, required=False,
+        self.parser.add_argument("--monitor", type=self._str2bool, required=False, default='n',
                         help="Выполнять мониторинг папки. true - мониторим папку," \
                         " false - обрабатывает то, что уже есть.")
 
