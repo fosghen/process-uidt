@@ -20,7 +20,7 @@ class CommandLineParser:
     def _setup_arguments(self):
         self.parser.add_argument('--path', type=str, required=False, default='.',
                                  help="Путь до папки с данными, если не указано, то папка откуда вызвана команда")
-        self.parser.add_argument('--params', type=str, required=False,
+        self.parser.add_argument('--params', type=str, required=False, default='params.yaml',
                                 help="Путь до файла с параметрами, если не указано," \
                                 " то ищется в папке, где вызвано. При не нахождении создаёт шаблон")
         self.parser.add_argument("--monitor", type=self._str2bool, required=False, default='n',

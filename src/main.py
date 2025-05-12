@@ -10,8 +10,8 @@ def main():
     parser = CommandLineParser()
     args = parser.parse()
 
-    if args.params:
-        params = Reader(Path(args.params)).read_init_file()
+    if (Path(args.path) / args.params).is_file():
+        params = Reader(Path(args.path) / args.params).read_init_file()
     else:
         params = Reader(Path(args.path) / "params.yaml").write_default_init_file()
     
