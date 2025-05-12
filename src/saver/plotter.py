@@ -71,7 +71,7 @@ class Plotter:
         ax.axhline(self.freq_cut, c="lightgreen", lw=1)
 
         for mark in [self.point_cut, self.point_start, point_end]:
-            ax.axvline(length[self._get_index(mark)], color='r', lw=1)
+            ax.axvline(length[min(self._get_index(mark), length.size - 1)], color='r', lw=1)
             
         ax.set_ylabel("Частота, МГц")
     
