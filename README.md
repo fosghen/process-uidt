@@ -35,7 +35,7 @@
 1. Обработка всех файлов в текущей директории: `process-uidt`
 2. Обработка файлов в указанной папке: `process-uidt --path ./dir1`
 3. Обработка с указанием файла параметров: `process-uidt --path ./dir1 --params ./dir2/params1.yaml`
-4. Запуск в режиме мониторинга: `process-uidt --path ./dir1 --monitor`
+4. Запуск в режиме мониторинга: `process-uidt --path ./dir1 --monitor true`
 
 Запуск `process-uidt` идентичен ``process-uidt --path . --params ./params.yaml --monitor false``
 
