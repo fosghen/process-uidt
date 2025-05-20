@@ -63,7 +63,7 @@ class Plotter:
                     )
                     )
 
-        ax.plot(length,
+        ax.plot(length[self._get_index(self.point_start): self._get_index(point_end)],
                 peaks_freq,
                 alpha=self.transparency,
                 c='k')

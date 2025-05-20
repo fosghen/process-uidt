@@ -57,11 +57,17 @@ class Processor:
     def _read_file(self, path: Path) -> tuple[np.ndarray, np.ndarray]:
         skip_rows, freqs = self._define_rowskip(path)
         
-        data = pl.read_csv(path, separator=";", skip_rows=skip_rows, columns=range(1, len(freqs) + 1)).to_numpy()
-        length = self._get_length(path)
+        data = pl.read_csv(
+            path,
+            separator=";",
+            skip_rows=skip_rows,
+            columns=range(0, len(freqs) + 1), 
+            truncate_ragged_lines=True
+            ).to_numpy()
+        length = data[:, 0]
         self.dx = abs(length[1] - length[0])
 
-        return data, np.array(freqs, dtype=np.float32)
+        return data[:, 1:], np.array(freqs, dtype=np.float32), length
 
     def _define_num_phase(self, fname: Path) -> int:
         with fname.open() as f:
@@ -82,31 +88,32 @@ class Processor:
         return int(length / self.dx)
 
     def _data_prepare(self, path: Path) -> tuple[np.ndarray, np.ndarray]:
-        data, freqs = self._read_file(path)
+        data, freqs, length = self._read_file(path)
         data_norm = self._norm_data_by_ballast(data, self._define_num_phase(path))
-        return data_norm * self._make_inv(data_norm), freqs
+        return data_norm * self._make_inv(data_norm), freqs, length
 
 
     def process_file(self, path: Path) -> None:
         sleep(0.5)
         print(f"Начали обрабатывать {path}")
         
-        data_norm, freqs = self._data_prepare(path)
-        length = self._get_length(path)
+        data_norm, freqs, length = self._data_prepare(path)
+        point_end = min(data_norm.shape[0] * self.dx - self.dx, self.point_end)
         
         self.plotter.output_dir = path.parent / "Figures"
         self.plotter.dx = abs(length[1] - length[0])
+        self.plotter.point_end = point_end
 
         self.saver.output_dir = path.parent / "Peaks"
 
         f0 = self.finder.find_peak(freqs,
                                 self._norm_data_by_max(data_norm).T[self._get_index(self.point_start):
-                                                                    self._get_index(self.point_end)])
+                                                                    self._get_index(point_end)])
+        
         self.plotter.create_plot(data_norm,
                             freqs,
-                            length[self._get_index(self.point_start):
-                                   self._get_index(self.point_end)],
+                            length,
                             f0,
                             path)
-        self.saver.add_peak(f0, path.stem)
+        self.saver.add_peak(f0, path.stem, length[self._get_index(self.point_start): self._get_index(point_end)])
         print(f"Закончили обрабатывать {path}")

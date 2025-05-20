@@ -29,7 +29,10 @@ class PeakFinder:
             # Выбираем два наиболее амлитудных
             hi_peak = peaks_hi[np.argsort(result[peaks_hi, i])[-2:]]
             # Берём сигнал от левого пика до правого и в нём находим минимум
-            low_peak = np.argmin(result[min(hi_peak): max(hi_peak), i]) + min(hi_peak)
+            try:
+                low_peak = np.argmin(result[min(hi_peak): max(hi_peak), i]) + min(hi_peak)
+            except ValueError:
+                low_peak = int(data.shape[0] // 2)
             low_peaks[i] = low_peak
             hi_peaks[i] = hi_peak
         return (low_peaks, hi_peaks)
