@@ -54,7 +54,16 @@ class Processor:
             coef = -1
         return coef
     
-    def _read_file(self, path: Path) -> tuple[np.ndarray, np.ndarray]:
+    def _check_end_creating(self, path: Path) -> None:
+        # Ждём, пока закончится запись файла
+        file_size_prev = 0
+        
+        while (path.stat().st_size != file_size_prev):
+            file_size_prev = path.stat().st_size
+            sleep(0.5)
+
+    def _read_file(self, path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        self._check_end_creating(path)
         skip_rows, freqs = self._define_rowskip(path)
         
         data = pl.read_csv(
@@ -87,7 +96,7 @@ class Processor:
     def _get_index(self, length: float) -> int:
         return int(length / self.dx)
 
-    def _data_prepare(self, path: Path) -> tuple[np.ndarray, np.ndarray]:
+    def _data_prepare(self, path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         data, freqs, length = self._read_file(path)
         data_norm = self._norm_data_by_ballast(data, self._define_num_phase(path))
         return data_norm * self._make_inv(data_norm), freqs, length
