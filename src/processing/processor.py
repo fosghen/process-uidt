@@ -72,7 +72,7 @@ class Processor:
             skip_rows=skip_rows,
             columns=range(0, len(freqs) + 1), 
             truncate_ragged_lines=True
-            ).to_numpy()
+            ).with_columns([pl.col("*").cast(pl.Float32)]).to_numpy()
         length = data[:, 0]
         self.dx = abs(length[1] - length[0])
 
