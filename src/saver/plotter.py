@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from pathlib import Path
 import numpy as np
 
@@ -32,6 +33,8 @@ class Plotter:
         self._plot_reflectograms(ax[0, 0], data, freqs, length, f0)
         
         self._plot_additional_slices(ax, data, freqs, length)
+
+        self._add_title(fig, fname)
         
         save_path = self.output_dir / f"{fname.stem}.png"
 
@@ -41,6 +44,9 @@ class Plotter:
         plt.close()
         return save_path
     
+    def _add_title(self, fig: Figure, fname: Path) -> None:
+        fig.suptitle(fname.stem)
+
     def _get_index(self, length: float) -> int:
         return int(length / self.dx)
 
