@@ -59,13 +59,13 @@ class Plotter:
         data_norm /= data_norm.max(axis=0)
         
         ax.imshow(
-            data_norm[:, self._get_index(self.point_start): 
+            data_norm[::-1, self._get_index(self.point_start): 
                       self._get_index(point_end)],
             aspect="auto",
             extent=(self.point_start,
                     point_end,
-                    freqs.max(),
-                    freqs.min()
+                    freqs.min(),
+                    freqs.max()
                     )
                     )
 
@@ -102,7 +102,7 @@ class Plotter:
 
         for i, mark in enumerate([self.point_start, self.point_cut, point_end]):
             ax[0, i + 1].plot(data_norm.T[self._get_index(mark)], freqs)
-            ax[0, i + 1].set_ylim(freqs.max(), freqs.min())
+            ax[0, i + 1].set_ylim(freqs.min(), freqs.max())
             ax[0, i + 1].set_xlabel(labels[i])
             ax[0, i + 1].tick_params(axis='y', left=False, labelleft=False)
             
