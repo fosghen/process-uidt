@@ -130,7 +130,8 @@ class PlotterStats:
         self._add_title(fig, fname)
         ax.grid(which="both")
         ax.set_xlabel("Расстояние, м")
-        ax.set_ylabel("СКО, $^o$C")
+        ax.set_ylabel("СКО, МГц")
+        ax.set_ylim(0, 20)
 
         save_path = self.output_dir / f"{fname.stem}_std.png"
         plt.savefig(save_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
