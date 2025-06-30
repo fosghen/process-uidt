@@ -115,3 +115,23 @@ class Plotter:
             ax[0, i + 1].xaxis.set_minor_locator(MultipleLocator(0.2))
             ax[0, i + 1].grid(which="both")
             
+
+class PlotterStats:
+    def __init__(self, output_dir: Path):
+        self.output_dir = output_dir
+
+    def _add_title(self, fig: Figure, fname: Path) -> None:
+        fig.suptitle(fname.stem)
+
+    def plot_std(self, data: np.ndarray, length: np.ndarray, fname: Path):
+        fig, ax = plt.subplots()
+
+        ax.plot(length, data, c ='k')
+        self._add_title(fig, fname)
+        ax.grid(which="both")
+        ax.set_xlabel("Расстояние, м")
+        ax.set_ylabel("СКО, $^o$C")
+
+        save_path = self.output_dir / f"{fname.stem}_std.png"
+        plt.savefig(save_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
+        plt.close()
