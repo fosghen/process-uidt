@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from pathlib import Path
 import numpy as np
+from matplotlib.ticker import MultipleLocator
 
 class Plotter:
     def __init__(self, freq_cut: int, point_cut: float, point_start: float,
@@ -80,6 +81,8 @@ class Plotter:
             ax.axvline(length[min(self._get_index(mark), length.size - 1)], color='r', lw=1)
             
         ax.set_ylabel("Частота, МГц")
+        ax.set_xlim(self.point_start, point_end)
+        ax.grid(which="both")
     
     def _plot_additional_slices(self, ax, data, freqs, length):
         """Отрисовка дополнительных срезов"""
@@ -92,9 +95,13 @@ class Plotter:
                       data[self._get_index(self.point_start): self._get_index(point_end),
                         ind_freq])
         
-        
+        data_tmp = data[self._get_index(self.point_start): self._get_index(point_end), ind_freq]
+        ax[1, 0].yaxis.set_major_locator(MultipleLocator(data_tmp.max() - data_tmp.min()))
+        ax[1, 0].yaxis.set_minor_locator(MultipleLocator((data_tmp.max() - data_tmp.min()) / 5))
+
         ax[1, 0].set_xlim(self.point_start, point_end)
         ax[1, 0].set_xlabel("Расстояние, м")
+        ax[1, 0].grid(which="both")
 
         data_norm = data.T
         data_norm -= data_norm.min(axis=0)
@@ -105,4 +112,6 @@ class Plotter:
             ax[0, i + 1].set_ylim(freqs.min(), freqs.max())
             ax[0, i + 1].set_xlabel(labels[i])
             ax[0, i + 1].tick_params(axis='y', left=False, labelleft=False)
+            ax[0, i + 1].xaxis.set_minor_locator(MultipleLocator(0.2))
+            ax[0, i + 1].grid(which="both")
             
