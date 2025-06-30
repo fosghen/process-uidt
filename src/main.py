@@ -21,7 +21,8 @@ def main():
                           point_end=params.point_end,
                           freq_cut=params.freq_cut,
                           transparency=params.transparency,
-                          data_type=params.data_type)
+                          data_type=params.data_type,
+                          inv=params.inv)
 
     if not args.monitor:
         OnceFileHandler(processor.process_file).process_directory(Path(args.path))
