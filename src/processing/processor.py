@@ -4,8 +4,9 @@ import numpy as np
 import polars as pl
 
 from src.saver.peak_saver import PeakSaver
-from src.saver.plotter import Plotter
+from src.saver.plotter import Plotter, PlotterStats
 from src.processing.peak_finder import PeakFinder
+from src.processing.stats_computer import StatsComputer
 
 class Processor:
     def __init__(self, num_pts_norm: int, point_cut: float,
@@ -29,6 +30,8 @@ class Processor:
                  self.point_end, self.dx, Path("Figures"), self.transparency)
         self.finder = PeakFinder(self.data_type)
         self.saver = PeakSaver(Path("Peaks"))
+        self.stats_plotter = PlotterStats(Path("Figures"))
+        self.stats_cumputer = StatsComputer(51)
 
     def _define_rowskip(self, fname: Path) -> tuple[int, list[str]]:
         with fname.open() as f:
@@ -114,10 +117,15 @@ class Processor:
         self.plotter.point_end = point_end
 
         self.saver.output_dir = path.parent / "Peaks"
+        self.stats_plotter.output_dir = path.parent / "Figures"
 
         f0 = self.finder.find_peak(freqs,
                                 self._norm_data_by_max(data_norm).T[self._get_index(self.point_start):
                                                                     self._get_index(point_end)])
+        
+        self.stats_plotter.plot_std(
+            self.stats_cumputer.compute_std(f0),
+            length[self._get_index(self.point_start): self._get_index(point_end)], path)
         
         self.plotter.create_plot(data_norm,
                             freqs,
