@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "process-uidt"
-version = "0.1.2"
+version = "0.1.3"
 description = ""
 authors = ["fosghen <r.efremov2@g.nsu.ru>"]
 readme = "README.md"
