@@ -11,6 +11,7 @@ class AppParams(BaseModel):
     freq_cut: int = 10800
     num_pts_norm: int = 20
     data_type: str = "refl"
+    max_std: float = 20
     transparency: Annotated[float, Field(ge=0, le=1)] = 0.6 
     
     @field_validator('point_start')
