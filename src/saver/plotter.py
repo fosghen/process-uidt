@@ -19,7 +19,7 @@ class Plotter:
         self.transparency = transparency
 
     def create_plot(self, data: np.ndarray, freqs: np.ndarray, length: np.ndarray,
-                    f0: np.ndarray, fname: Path):
+                    f0: np.ndarray, fname: Path, laplace: np.ndarray) -> Path:
             
         fig, ax = plt.subplots(2, 4, 
                               gridspec_kw={
@@ -33,7 +33,7 @@ class Plotter:
         
         self._plot_reflectograms(ax[0, 0], data, freqs, length, f0)
         
-        self._plot_additional_slices(ax, data, freqs, length)
+        self._plot_additional_slices(ax, data, freqs, length, laplace)
 
         self._add_title(fig, fname)
         
@@ -84,7 +84,8 @@ class Plotter:
         ax.set_xlim(self.point_start, point_end)
         ax.grid(which="both")
     
-    def _plot_additional_slices(self, ax, data, freqs, length):
+    def _plot_additional_slices(self, ax: plt.Axes, data: np.ndarray,
+                                freqs: np.ndarray, length: np.ndarray, laplace: np.ndarray):
         """Отрисовка дополнительных срезов"""
         labels = ["Начало", "Срез", "Конец"]
 
@@ -109,6 +110,7 @@ class Plotter:
 
         for i, mark in enumerate([self.point_start, self.point_cut, point_end]):
             ax[0, i + 1].plot(data_norm.T[self._get_index(mark)], freqs)
+            ax[0, i + 1].plot(laplace[i], freqs, c='r')
             ax[0, i + 1].set_ylim(freqs.min(), freqs.max())
             ax[0, i + 1].set_xlabel(labels[i])
             ax[0, i + 1].tick_params(axis='y', left=False, labelleft=False)
@@ -117,8 +119,9 @@ class Plotter:
             
 
 class PlotterStats:
-    def __init__(self, output_dir: Path):
+    def __init__(self, output_dir: Path, max: float=20):
         self.output_dir = output_dir
+        self.max = max
 
     def _add_title(self, fig: Figure, fname: Path) -> None:
         fig.suptitle(fname.stem)
@@ -131,7 +134,7 @@ class PlotterStats:
         ax.grid(which="both")
         ax.set_xlabel("Расстояние, м")
         ax.set_ylabel("СКО, МГц")
-        ax.set_ylim(0, 20)
+        ax.set_ylim(0, self.max)
 
         save_path = self.output_dir / f"{fname.stem}_std.png"
         plt.savefig(save_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
