@@ -7,22 +7,21 @@ from src.saver.peak_saver import PeakSaver
 from src.saver.plotter import Plotter, PlotterStats
 from src.processing.peak_finder import PeakFinder
 from src.processing.stats_computer import StatsComputer
+from src.initializer.initializer import AppParams
 
 class Processor:
-    def __init__(self, num_pts_norm: int, point_cut: float,
-                 point_start: float, point_end: float, freq_cut: int,
-                 data_type: str, transparency: float, inv: str="auto"):
-        self.inv = inv    
-        self.num_pts_norm = num_pts_norm
+    def __init__(self, params: AppParams):
+        self.inv = params.inv    
+        self.num_pts_norm = params.num_pts_norm
 
-        self.point_cut = point_cut
-        self.point_start = point_start
-        self.point_end = point_end
-        self.freq_cut = freq_cut
+        self.point_cut = params.point_cut
+        self.point_start = params.point_start
+        self.point_end = params.point_end
+        self.freq_cut = params.freq_cut
 
-        self.transparency = transparency
+        self.transparency = params.transparency
 
-        self.data_type = data_type
+        self.data_type = params.data_type
 
         self.dx = 1
 
@@ -30,7 +29,7 @@ class Processor:
                  self.point_end, self.dx, Path("Figures"), self.transparency)
         self.finder = PeakFinder(self.data_type)
         self.saver = PeakSaver(Path("Peaks"))
-        self.stats_plotter = PlotterStats(Path("Figures"))
+        self.stats_plotter = PlotterStats(Path("Figures"), max=params.max_std)
         self.stats_cumputer = StatsComputer(51)
 
     def _define_rowskip(self, fname: Path) -> tuple[int, list[str]]:
@@ -127,10 +126,17 @@ class Processor:
             self.stats_cumputer.compute_std(f0),
             length[self._get_index(self.point_start): self._get_index(point_end)], path)
         
+        approx_laplace = self.finder.get_approx_laplace(
+            freqs, 
+            self._norm_data_by_max(data_norm).T[[self._get_index(self.point_start), self._get_index(self.point_cut), self._get_index(point_end)]]
+            )
+
         self.plotter.create_plot(data_norm,
                             freqs,
                             length,
                             f0,
-                            path)
+                            path,
+                            approx_laplace)
+
         self.saver.add_peak(f0, path.stem, length[self._get_index(self.point_start): self._get_index(point_end)])
         print(f"Закончили обрабатывать {path}")

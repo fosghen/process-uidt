@@ -15,14 +15,7 @@ def main():
     else:
         params = Reader(Path(args.path) / "params.yaml").write_default_init_file()
     
-    processor = Processor(num_pts_norm=params.num_pts_norm, 
-                          point_cut=params.point_cut,
-                          point_start=params.point_start,
-                          point_end=params.point_end,
-                          freq_cut=params.freq_cut,
-                          transparency=params.transparency,
-                          data_type=params.data_type,
-                          inv=params.inv)
+    processor = Processor(params)
 
     if not args.monitor:
         OnceFileHandler(processor.process_file).process_directory(Path(args.path))
