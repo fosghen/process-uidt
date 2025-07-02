@@ -122,10 +122,6 @@ class Processor:
                                 self._norm_data_by_max(data_norm).T[self._get_index(self.point_start):
                                                                     self._get_index(point_end)])
         
-        self.stats_plotter.plot_std(
-            self.stats_cumputer.compute_std(f0),
-            length[self._get_index(self.point_start): self._get_index(point_end)], path)
-        
         approx_laplace = self.finder.get_approx_laplace(
             freqs, 
             self._norm_data_by_max(data_norm).T[[self._get_index(self.point_start), self._get_index(self.point_cut), self._get_index(point_end)]]
@@ -137,6 +133,10 @@ class Processor:
                             f0,
                             path,
                             approx_laplace)
-
+        
+        self.stats_plotter.plot_std(
+            self.stats_cumputer.compute_std(f0),
+            length[self._get_index(self.point_start): self._get_index(point_end)], path)
+        
         self.saver.add_peak(f0, path.stem, length[self._get_index(self.point_start): self._get_index(point_end)])
         print(f"Закончили обрабатывать {path}")
